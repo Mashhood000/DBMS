@@ -1,0 +1,542 @@
+1.Dropshipped_Products
+
+    dropship_id (PK)
+    product_name
+    site_link
+    original_price
+    sale_price
+
+2.Warehouse_Products
+
+    warehouse_id (PK)
+    product_name
+    quantity
+    till_sold
+    original_price
+    sale_price
+
+3.Shopify_Store
+
+    Store_p_id (PK)
+    name
+    dropship_id (FK)
+    a_id (FK)
+    price
+    margin
+
+4.Orders
+
+    order_id (PK)
+    Store_p_id (FK)
+    quantity
+    price
+    order_date
+    order_time
+    delivery_date
+    user_id (FK)
+    payment_method
+
+5.Amazon_Store
+
+    amazon_id (PK)
+    house_id (FK)
+    name
+    product_fulfillment(Done/Pending)
+    Date_send
+    price
+    Margin
+    
+6.Users
+
+    user_id (PK)
+    username
+    order_id (FK)
+    email
+    Date_joined
+
+7.Sales
+
+    sale_id (PK)
+    order_id (FK)
+    date_placed
+    date_delivery
+    price
+
+8.Employees_data
+
+    e_id (PK)
+    name
+    post
+    email
+    phone_no
+    CNIC
+    Salary
+    Date_joined
+    Experience
+    Currently_active
+
+9.Credentials
+
+    username (PK)
+    user_id (FK)
+    passwd
+    Access
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+PROJECT CODE MYSQL 
+
+
+
+ 
+
+show databases;
+create database Inventory;
+use Inventory;
+show tables;
+
+Table Creation queries
+
+Category
+create table category(category_id int NOT NULL,category_name varchar(100) primary key);
+
+
+Dropshipped_products
+create table Dropshipped_Products(dropship_id int NOT NULL primary key auto_increment,
+product_name varchar(200)unique,site_link varchar(255),original_price float NOT NULL , 
+sale_price float ,
+category varchar(100),
+foreign key (category) references category(category_name)
+);
+
+
+Warehouse_Products
+create table Warehouse_Products(warehouse_id int NOT NULL primary key auto_increment,
+product_name varchar(255), quantity int ,availability varchar(15) check(availability in ("Sold","Available")),
+original_price float,
+category varchar(100),
+foreign key (category) references category(category_name)
+);
+
+Shopify_Store
+create table Shopify_Store(Product_id int NOT NULL primary key auto_increment,
+product_name varchar(255),
+shopify_price float,
+margin float,
+dropshiping_id int,
+category varchar(100),
+warehouse_id int,
+foreign key (dropshiping_id) references   Dropshipped_Products(dropship_id),
+foreign key (warehouse_id) references Warehouse_Products(warehouse_id),
+foreign key (category) references category(category_name)
+);
+
+Amazon_Store
+create table Amazon_Store(amazon_id int NOT NULL PRIMARY KEY ,
+name varchar(150),
+product_fulfillment varchar(15) check(product_fulfillment in ("Done","Pending")),
+Date_send Date,
+amazon_price float,
+ margin float ,
+ category varchar(100),
+ warehouse_id int,
+foreign key (category) references category(category_name),
+foreign key (warehouse_id) references Warehouse_Products(warehouse_id)
+);
+
+users
+create table users(user_id int NOT NULL PRIMARY key,
+username varchar(150),
+email varchar(255),
+Date_joined date
+);
+
+ Orders
+
+CREATE TABLE Orders (
+    order_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    quantity INT,
+    price float,
+    order_date DATE,
+    order_time TIME,
+    delivery_date DATE,
+    payment_method VARCHAR(50),
+    user_id int ,
+    Store_p_id int,
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (Store_P_id) REFERENCES Shopify_Store(Product_id)
+ 
+);
+
+
+table sales
+
+-- create table sales(
+-- sale_id int NOT NULL PRIMARY KEY auto_increment,
+-- order_id int,
+-- profit float,
+-- foreign key (order_id) references orders(order_id),
+ -- FOREIGN KEY (Product_id) REFERENCES Shopify_Store(Product_id)
+-- );
+
+Employees_data
+create table Employees_data(
+emp_id int not null primary key auto_increment,
+name varchar(150),
+Position varchar(30) check(Position in ("Junior","Senior","Admin")),
+email varchar(100),
+phone_no int ,
+CNIC int ,
+Salary int,
+Date_joined Date,
+Experience_Years float,
+Currently_Availability varchar(25) check(Currently_Availability in ("Active","Inactive"))
+
+);
+
+credentials
+create table credentials(
+username varchar(100) primary key,
+passwd varchar(255),
+Permissions varchar(200) check(Permissions in ("Read-only","Read-Write","Read-Write-Delete")),
+user_id int,
+foreign key (user_id) references users(user_id)
+);
+
+
+user-log
+CREATE TABLE user_logs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    message VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Insertion Queries
+
+sql queries
+
+dropshipped
+
+insert into dropshipped_products(dropship_id,product_name,site_link,original_price,sale_price,category)
+     values(1,"HP zbook 14","https://alibaba/products/223443",999.9,1199.9,"Electronics");
+
+
+category
+
+insert into category(category_id,category_name)
+     values(1,"Electronics");
+
+
+credentials
+
+ insert into credentials(username,passwd,Permissions,user_id)
+     values("admin"," 21232f297a57a5a743894a0e4a801fc3","Read-Write-Delete",1);
+
+
+UPDATE credentials
+     SET user_id = 2
+     where username = "Mashhood";
+
+
+amazon 
+
+
+insert into amazon_store(amazon_id,name,product_fulfillment,Date_send,amazon_price,margin,warehouse_id)
+ values(1,"Dell prescision 5570","Pending",'2024-04-19',2000,350,"Electronics");
+
+warehouse
+
+
+insert into warehouse_products(warehouse_id,product_name,quantity,availability,original_price,category)
+ values(1,"Dell Precision 5570",10,"Available",1750,"Electronics");
+
+
+shopify_store 
+
+
+
+ insert into shopify_store(Product_id,product_name,shopify_price,margin,dropshiping_id,category,warehouse_id)
+ values(1,"HP zbook 14",1199.9,200,1,"Electronics",NULL);
+
+
+
+orders
+
+
+ INSERT INTO orders (quantity, price, order_date, order_time, delivery_date, payment_method, user_id, Store_p_id)
+
+  VALUES (5, 100.00, '2024-04-24', '11:25:44', '2024-04-22', 'Credit Card', 1, 1);
+
+
+
+employees_data 
+
+
+ INSERT INTO employees_data (name, Position, email, phone_no,CNIC,Salary, Date_joined, Experience_Years, Currently_Availability)
+ VALUES ('Ibrahim','Junior','ibrahim@gmail.com','92345678900','32343536378',100000,'2024-04-21', 2.5, 'Inactive');
+
+
+
+Procedures,Functions and Triggers
+DELIMITER //
+CREATE FUNCTION calculate_order_profit(orderId INT) RETURNS FLOAT
+DETERMINISTIC
+BEGIN
+    DECLARE dropship_profit FLOAT DEFAULT 0;
+    DECLARE warehouse_profit FLOAT DEFAULT 0;
+
+
+    SELECT SUM((S.shopify_price - D.original_price) * O.quantity) 
+    INTO dropship_profit
+    FROM Orders O
+    JOIN Shopify_Store S ON O.Store_p_id = S.Product_id
+    JOIN Dropshipped_Products D ON S.dropshiping_id = D.dropship_id
+    WHERE O.order_id = orderId;
+
+    
+    SELECT SUM((S.shopify_price - W.original_price) * O.quantity) 
+    INTO warehouse_profit
+    FROM Orders O
+    JOIN Shopify_Store S ON O.Store_p_id = S.Product_id
+    JOIN Warehouse_Products W ON S.warehouse_id = W.warehouse_id
+    WHERE O.order_id = orderId;
+
+    RETURN IFNULL(dropship_profit, 0) + IFNULL(warehouse_profit, 0);
+END;
+//
+DELIMITER ;
+
+SELECT calculate_order_profit(1) AS order_profit;
+
+
+
+
+
+
+Delimiter //
+CREATE FUNCTION get_total_sales(orderId INT) RETURNS FLOAT
+Deterministic
+BEGIN
+    DECLARE total_sales FLOAT;
+    SELECT SUM(price * quantity) INTO total_sales
+    FROM Orders
+    WHERE order_id = orderId;
+    RETURN total_sales;
+END;
+//
+Delimiter;
+
+select get_total_sales(1);
+
+
+
+
+
+
+
+
+
+DELIMITER //
+
+CREATE FUNCTION get_total_quantity_by_category(categoryName VARCHAR(100)) RETURNS INT
+DETERMINISTIC
+BEGIN
+    DECLARE total_quantity INT DEFAULT 0;
+    SELECT IFNULL(SUM(quantity), 0) INTO total_quantity
+    FROM Warehouse_Products
+    WHERE category = categoryName;
+    RETURN total_quantity;
+END//
+
+DELIMITER ;
+
+SELECT get_total_quantity_by_category('Electronics') AS total_quantity;
+
+
+
+
+CREATE FUNCTION get_dropshipped_product_name(dropshipId INT) RETURNS VARCHAR(200)
+DETERMINISTIC
+BEGIN
+    DECLARE product_name VARCHAR(200);
+    SELECT product_name INTO product_name
+    FROM Dropshipped_Products
+    WHERE dropship_id = dropshipId;
+    RETURN product_name;
+END//
+
+DELIMITER ;
+
+
+drop function get_dropshipped_product_name;
+
+SELECT get_dropshipped_product_name(1) ;
+
+
+
+Delimiter //
+CREATE FUNCTION get_employee_name(empId INT) RETURNS VARCHAR(150)
+Deterministic
+BEGIN
+    DECLARE emp_name VARCHAR(150);
+    SELECT name INTO emp_name
+    FROM Employees_data
+    WHERE emp_id = empId;
+    RETURN emp_name;
+END;
+//
+DELIMITER ;
+
+
+
+
+
+
+
+
+
+
+CREATE PROCEDURE update_shopify_price(
+    IN productId INT,
+    IN new_price FLOAT
+)
+BEGIN
+    UPDATE Shopify_Store
+    SET shopify_price = new_price
+    WHERE Product_id = productId;
+END;
+
+
+
+CREATE PROCEDURE delete_amazon_product(
+    IN amazonId INT
+)
+BEGIN
+    DELETE FROM Amazon_Store
+    WHERE amazon_id = amazonId;
+END;
+
+
+
+
+
+CREATE PROCEDURE get_orders_by_user(
+    IN userId INT
+)
+BEGIN
+    SELECT O.order_id, O.quantity, O.price, O.order_date, O.delivery_date, S.product_name
+    FROM Orders O
+    JOIN Shopify_Store S ON O.Store_p_id = S.Product_id
+    WHERE O.user_id = userId;
+END;
+call get_orders_by_user(2);
+
+
+
+
+CREATE PROCEDURE get_all_products_and_categories()
+BEGIN
+    SELECT P.product_name, P.site_link, P.original_price, P.sale_price, C.category_name
+    FROM Dropshipped_Products P
+    JOIN category C ON P.category = C.category_name;
+END;
+
+
+
+
+CREATE PROCEDURE update_order_delivery_date(
+    IN orderId INT,
+    IN new_delivery_date DATE
+)
+BEGIN
+    UPDATE Orders
+    SET delivery_date = new_delivery_date
+    WHERE order_id = orderId;
+END;
+
+
+
+update_time
+
+DELIMITER //
+CREATE TRIGGER update_orders
+before INSERT ON orders
+FOR EACH ROW
+BEGIN
+    SET NEW.time_added = CURRENT_TIMESTAMP();
+END;
+//
+DELIMITER ;
+
+
+
+
+DELIMITER //
+CREATE TRIGGER after_user_insert
+AFTER INSERT ON users
+FOR EACH ROW
+BEGIN
+    DECLARE welcome_message VARCHAR(255);
+    SET welcome_message = CONCAT('Welcome ', NEW.username);
+    INSERT INTO user_logs (user_id, message)
+    VALUES (NEW.user_id, welcome_message);
+END;
+//
+DELIMITER ;
+
+
+DELIMITER //
+CREATE TRIGGER after_user_insert
+AFTER INSERT ON users
+FOR EACH ROW
+BEGIN
+    DECLARE welcome_message VARCHAR(255);
+    SET welcome_message = CONCAT('Welcome ', NEW.username);
+    INSERT INTO user_logs (user_id, message)
+    VALUES (NEW.user_id, welcome_message);
+END;
+//
+DELIMITER ;
+
+
+
